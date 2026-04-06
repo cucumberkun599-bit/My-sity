@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Геометричний Калькулятор</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .category {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .category h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .shape-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .shape-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .shape-btn:hover, .shape-btn.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .calculator-form {
+            display: none;
+        }
+
+        .calculator-form.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .formula {
+            font-family: 'Courier New', monospace;
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .shape-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .categories { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📐 Геометричний Калькулятор</h1>
+        
+        <div class="categories">
+            <!-- Плоскі фігури -->
+            <div class="category">
+                <h2>📏 Плоскі фігури</h2>
+                <div class="shape-selector">
+                    <button class="shape-btn active" onclick="showShape('square')">Квадрат</button>
+                    <button class="shape-btn" onclick="showShape('rectangle')">Прямокутник</button>
+                    <button class="shape-btn" onclick="showShape('triangle')">Трикутник</button>
+                    <button class="shape-btn" onclick="showShape('circle')">Круг</button>
+                    <button class="shape-btn" onclick="showShape('trapezoid')">Трапеція</button>
+                </div>
+
+                <!-- Квадрат -->
+                <div id="square" class="calculator-form active">
+                    <div class="shape-icon">⬜</div>
+                    <div class="input-group">
+                        <label>Сторона (a):</label>
+                        <input type="number" id="sq-side" placeholder="Введіть довжину сторони" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcSquare()">Обчислити</button>
+                    <div id="sq-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Площа:</span>
+                            <span><span class="formula">S = a²</span> = <strong id="sq-area"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Периметр:</span>
+                            <span><span class="formula">P = 4a</span> = <strong id="sq-perimeter"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Діагональ:</span>
+                            <span><span class="formula">d = a√2</span> = <strong id="sq-diagonal"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Прямокутник -->
+                <div id="rectangle" class="calculator-form">
+                    <div class="shape-icon">▭</div>
+                    <div class="input-group">
+                        <label>Довжина (a):</label>
+                        <input type="number" id="rect-length" placeholder="Введіть довжину" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Ширина (b):</label>
+                        <input type="number" id="rect-width" placeholder="Введіть ширину" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcRectangle()">Обчислити</button>
+                    <div id="rect-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Площа:</span>
+                            <span><span class="formula">S = a × b</span> = <strong id="rect-area"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Периметр:</span>
+                            <span><span class="formula">P = 2(a + b)</span> = <strong id="rect-perimeter"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Діагональ:</span>
+                            <span><span class="formula">d = √(a² + b²)</span> = <strong id="rect-diagonal"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Трикутник -->
+                <div id="triangle" class="calculator-form">
+                    <div class="shape-icon">△</div>
+                    <div class="input-group">
+                        <label>Сторона a:</label>
+                        <input type="number" id="tri-a" placeholder="Введіть сторону a" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Сторона b:</label>
+                        <input type="number" id="tri-b" placeholder="Введіть сторону b" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Сторона c:</label>
+                        <input type="number" id="tri-c" placeholder="Введіть сторону c" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcTriangle()">Обчислити (формула Герона)</button>
+                    <div id="tri-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Площа:</span>
+                            <span><span class="formula">S = √[p(p-a)(p-b)(p-c)]</span> = <strong id="tri-area"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Периметр:</span>
+                            <span><span class="formula">P = a + b + c</span> = <strong id="tri-perimeter"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Круг -->
+                <div id="circle" class="calculator-form">
+                    <div class="shape-icon">○</div>
+                    <div class="input-group">
+                        <label>Радіус (r):</label>
+                        <input type="number" id="circle-radius" placeholder="Введіть радіус" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcCircle()">Обчислити</button>
+                    <div id="circle-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Площа:</span>
+                            <span><span class="formula">S = πr²</span> = <strong id="circle-area"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Довжина кола:</span>
+                            <span><span class="formula">C = 2πr</span> = <strong id="circle-circumference"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Діаметр:</span>
+                            <span><span class="formula">d = 2r</span> = <strong id="circle-diameter"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Трапеція -->
+                <div id="trapezoid" class="calculator-form">
+                    <div class="shape-icon">⏢</div>
+                    <div class="input-group">
+                        <label>Основа a:</label>
+                        <input type="number" id="trap-a" placeholder="Введіть основу a" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Основа b:</label>
+                        <input type="number" id="trap-b" placeholder="Введіть основу b" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Висота h:</label>
+                        <input type="number" id="trap-h" placeholder="Введіть висоту" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Бічна сторона c:</label>
+                        <input type="number" id="trap-c" placeholder="Введіть бічну сторону c" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Бічна сторона d:</label>
+                        <input type="number" id="trap-d" placeholder="Введіть бічну сторону d" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcTrapezoid()">Обчислити</button>
+                    <div id="trap-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Площа:</span>
+                            <span><span class="formula">S = (a+b)/2 × h</span> = <strong id="trap-area"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Периметр:</span>
+                            <span><span class="formula">P = a + b + c + d</span> = <strong id="trap-perimeter"></strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Об'ємні фігури -->
+            <div class="category">
+                <h2>🎲 Об'ємні фігури</h2>
+                <div class="shape-selector">
+                    <button class="shape-btn active" onclick="showShape3D('cube')">Куб</button>
+                    <button class="shape-btn" onclick="showShape3D('cuboid')">Паралелепіпед</button>
+                    <button class="shape-btn" onclick="showShape3D('sphere')">Сфера</button>
+                    <button class="shape-btn" onclick="showShape3D('cylinder')">Циліндр</button>
+                    <button class="shape-btn" onclick="showShape3D('cone')">Конус</button>
+                </div>
+
+                <!-- Куб -->
+                <div id="cube" class="calculator-form active">
+                    <div class="shape-icon">🎲</div>
+                    <div class="input-group">
+                        <label>Ребро (a):</label>
+                        <input type="number" id="cube-edge" placeholder="Введіть довжину ребра" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcCube()">Обчислити</button>
+                    <div id="cube-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Об'єм:</span>
+                            <span><span class="formula">V = a³</span> = <strong id="cube-volume"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Площа поверхні:</span>
+                            <span><span class="formula">S = 6a²</span> = <strong id="cube-surface"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Діагональ:</span>
+                            <span><span class="formula">d = a√3</span> = <strong id="cube-diagonal"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Паралелепіпед -->
+                <div id="cuboid" class="calculator-form">
+                    <div class="shape-icon">📦</div>
+                    <div class="input-group">
+                        <label>Довжина (a):</label>
+                        <input type="number" id="cuboid-length" placeholder="Введіть довжину" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Ширина (b):</label>
+                        <input type="number" id="cuboid-width" placeholder="Введіть ширину" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Висота (c):</label>
+                        <input type="number" id="cuboid-height" placeholder="Введіть висоту" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcCuboid()">Обчислити</button>
+                    <div id="cuboid-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Об'єм:</span>
+                            <span><span class="formula">V = a × b × c</span> = <strong id="cuboid-volume"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Площа поверхні:</span>
+                            <span><span class="formula">S = 2(ab + bc + ac)</span> = <strong id="cuboid-surface"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Діагональ:</span>
+                            <span><span class="formula">d = √(a² + b² + c²)</span> = <strong id="cuboid-diagonal"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сфера -->
+                <div id="sphere" class="calculator-form">
+                    <div class="shape-icon">⚪</div>
+                    <div class="input-group">
+                        <label>Радіус (r):</label>
+                        <input type="number" id="sphere-radius" placeholder="Введіть радіус" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcSphere()">Обчислити</button>
+                    <div id="sphere-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Об'єм:</span>
+                            <span><span class="formula">V = 4/3 πr³</span> = <strong id="sphere-volume"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Площа поверхні:</span>
+                            <span><span class="formula">S = 4πr²</span> = <strong id="sphere-surface"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Діаметр:</span>
+                            <span><span class="formula">d = 2r</span> = <strong id="sphere-diameter"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Циліндр -->
+                <div id="cylinder" class="calculator-form">
+                    <div class="shape-icon">🥫</div>
+                    <div class="input-group">
+                        <label>Радіус основи (r):</label>
+                        <input type="number" id="cyl-radius" placeholder="Введіть радіус" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Висота (h):</label>
+                        <input type="number" id="cyl-height" placeholder="Введіть висоту" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcCylinder()">Обчислити</button>
+                    <div id="cyl-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Об'єм:</span>
+                            <span><span class="formula">V = πr²h</span> = <strong id="cyl-volume"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Площа поверхні:</span>
+                            <span><span class="formula">S = 2πr(r + h)</span> = <strong id="cyl-surface"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Площа бічної поверхні:</span>
+                            <span><span class="formula">S = 2πrh</span> = <strong id="cyl-lateral"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Конус -->
+                <div id="cone" class="calculator-form">
+                    <div class="shape-icon">🔺</div>
+                    <div class="input-group">
+                        <label>Радіус основи (r):</label>
+                        <input type="number" id="cone-radius" placeholder="Введіть радіус" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label>Висота (h):</label>
+                        <input type="number" id="cone-height" placeholder="Введіть висоту" step="any">
+                    </div>
+                    <button class="calculate-btn" onclick="calcCone()">Обчислити</button>
+                    <div id="cone-result" class="result">
+                        <h3>Результати:</h3>
+                        <div class="result-item">
+                            <span>Об'єм:</span>
+                            <span><span class="formula">V = 1/3 πr²h</span> = <strong id="cone-volume"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Утворююча (l):</span>
+                            <span><span class="formula">l = √(r² + h²)</span> = <strong id="cone-slant"></strong></span>
+                        </div>
+                        <div class="result-item">
+                            <span>Площа поверхні:</span>
+                            <span><span class="formula">S = πr(r + l)</span> = <strong id="cone-surface"></strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Перемикання між фігурами
+        function showShape(shapeId) {
+            // Ховаємо всі форми в категорії плоских фігур
+            document.querySelectorAll('.category:first-child .calculator-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            // Показуємо вибрану
+            document.getElementById(shapeId).classList.add('active');
+            
+            // Оновлюємо активну кнопку
+            document.querySelectorAll('.category:first-child .shape-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function showShape3D(shapeId) {
+            // Ховаємо всі форми в категорії об'ємних фігур
+            document.querySelectorAll('.category:last-child .calculator-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            // Показуємо вибрану
+            document.getElementById(shapeId).classList.add('active');
+            
+            // Оновлюємо активну кнопку
+            document.querySelectorAll('.category:last-child .shape-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Функції обчислення для плоских фігур
+        function calcSquare() {
+            const a = parseFloat(document.getElementById('sq-side').value);
+            if (isNaN(a) || a <= 0) {
+                alert('Будь ласка, введіть коректне значення сторони!');
+                return;
+            }
+            
+            const area = a * a;
+            const perimeter = 4 * a;
+            const diagonal = a * Math.sqrt(2);
+            
+            document.getElementById('sq-area').textContent = area.toFixed(4);
+            document.getElementById('sq-perimeter').textContent = perimeter.toFixed(4);
+            document.getElementById('sq-diagonal').textContent = diagonal.toFixed(4);
+            document.getElementById('sq-result').classList.add('show');
+        }
+
+        function calcRectangle() {
+            const a = parseFloat(document.getElementById('rect-length').value);
+            const b = parseFloat(document.getElementById('rect-width').value);
+            
+            if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) {
+                alert('Будь ласка, введіть коректні значення!');
+                return;
+            }
+            
+            const area = a * b;
+            const perimeter = 2 * (a + b);
+            const diagonal = Math.sqrt(a*a + b*b);
+            
+            document.getElementById('rect-area').textContent = area.toFixed(4);
+            document.getElementById('rect-perimeter').textContent = perimeter.toFixed(4);
+            document.getElementById('rect-diagonal').textContent = diagonal.toFixed(4);
+            document.getElementById('rect-result').classList.add('show');
+        }
+
+        function calcTriangle() {
+            const a = parseFloat(document.getElementById('tri-a').value);
+            const b = parseFloat(document.getElementById('tri-b').value);
+            const c = parseFloat(document.getElementById('tri-c').value);
+            
+            if (isNaN(a) || isNaN(b) || isNaN(c) || a <= 0 || b <= 0 || c <= 0) {
+                alert('Будь ласка, введіть коректні значення сторін!');
+                return;
+            }
+            
+            // Перевірка на існування трикутника
+            if (a + b <= c || a + c <= b || b + c <= a) {
+                alert('Такий трикутник не існує! Сума будь-яких двох сторін має бути більшою за третю.');
+                return;
+            }
+            
+            const perimeter = a + b + c;
+            const p = perimeter / 2;
+            const area = Math.sqrt(p * (p - a) * (p - b) * (p - c)); // Формула Герона [^5^]
+            
+            document.getElementById('tri-area').textContent = area.toFixed(4);
+            document.getElementById('tri-perimeter').textContent = perimeter.toFixed(4);
+            document.getElementById('tri-result').classList.add('show');
+        }
+
+        function calcCircle() {
+            const r = parseFloat(document.getElementById('circle-radius').value);
+            if (isNaN(r) || r <= 0) {
+                alert('Будь ласка, введіть коректний радіус!');
+                return;
+            }
+            
+            const area = Math.PI * r * r;
+            const circumference = 2 * Math.PI * r;
+            const diameter = 2 * r;
+            
+            document.getElementById('circle-area').textContent = area.toFixed(4);
+            document.getElementById('circle-circumference').textContent = circumference.toFixed(4);
+            document.getElementById('circle-diameter').textContent = diameter.toFixed(4);
+            document.getElementById('circle-result').classList.add('show');
+        }
+
+        function calcTrapezoid() {
+            const a = parseFloat(document.getElementById('trap-a').value);
+            const b = parseFloat(document.getElementById('trap-b').value);
+            const h = parseFloat(document.getElementById('trap-h').value);
+            const c = parseFloat(document.getElementById('trap-c').value) || 0;
+            const d = parseFloat(document.getElementById('trap-d').value) || 0;
+            
+            if (isNaN(a) || isNaN(b) || isNaN(h) || a <= 0 || b <= 0 || h <= 0) {
+                alert('Будь ласка, введіть коректні значення основ та висоти!');
+                return;
+            }
+            
+            const area = ((a + b) / 2) * h;
+            const perimeter = a + b + c + d;
+            
+            document.getElementById('trap-area').textContent = area.toFixed(4);
+            document.getElementById('trap-perimeter').textContent = (c && d) ? perimeter.toFixed(4) : 'Недостатньо даних';
+            document.getElementById('trap-result').classList.add('show');
+        }
+
+        // Функції обчислення для об'ємних фігур
+        function calcCube() {
+            const a = parseFloat(document.getElementById('cube-edge').value);
+            if (isNaN(a) || a <= 0) {
+                alert('Будь ласка, введіть коректне значення ребра!');
+                return;
+            }
+            
+            const volume = Math.pow(a, 3);
+            const surface = 6 * a * a;
+            const diagonal = a * Math.sqrt(3);
+            
+            document.getElementById('cube-volume').textContent = volume.toFixed(4);
+            document.getElementById('cube-surface').textContent = surface.toFixed(4);
+            document.getElementById('cube-diagonal').textContent = diagonal.toFixed(4);
+            document.getElementById('cube-result').classList.add('show');
+        }
+
+        function calcCuboid() {
+            const a = parseFloat(document.getElementById('cuboid-length').value);
+            const b = parseFloat(document.getElementById('cuboid-width').value);
+            const c = parseFloat(document.getElementById('cuboid-height').value);
+            
+            if (isNaN(a) || isNaN(b) || isNaN(c) || a <= 0 || b <= 0 || c <= 0) {
+                alert('Будь ласка, введіть коректні значення!');
+                return;
+            }
+            
+            const volume = a * b * c;
+            const surface = 2 * (a*b + b*c + a*c);
+            const diagonal = Math.sqrt(a*a + b*b + c*c);
+            
+            document.getElementById('cuboid-volume').textContent = volume.toFixed(4);
+            document.getElementById('cuboid-surface').textContent = surface.toFixed(4);
+            document.getElementById('cuboid-diagonal').textContent = diagonal.toFixed(4);
+            document.getElementById('cuboid-result').classList.add('show');
+        }
+
+        function calcSphere() {
+            const r = parseFloat(document.getElementById('sphere-radius').value);
+            if (isNaN(r) || r <= 0) {
+                alert('Будь ласка, введіть коректний радіус!');
+                return;
+            }
+            
+            const volume = (4/3) * Math.PI * Math.pow(r, 3);
+            const surface = 4 * Math.PI * r * r;
+            const diameter = 2 * r;
+            
+            document.getElementById('sphere-volume').textContent = volume.toFixed(4);
+            document.getElementById('sphere-surface').textContent = surface.toFixed(4);
+            document.getElementById('sphere-diameter').textContent = diameter.toFixed(4);
+            document.getElementById('sphere-result').classList.add('show');
+        }
+
+        function calcCylinder() {
+            const r = parseFloat(document.getElementById('cyl-radius').value);
+            const h = parseFloat(document.getElementById('cyl-height').value);
+            
+            if (isNaN(r) || isNaN(h) || r <= 0 || h <= 0) {
+                alert('Будь ласка, введіть коректні значення!');
+                return;
+            }
+            
+            const volume = Math.PI * r * r * h;
+            const surface = 2 * Math.PI * r * (r + h);
+            const lateral = 2 * Math.PI * r * h;
+            
+            document.getElementById('cyl-volume').textContent = volume.toFixed(4);
+            document.getElementById('cyl-surface').textContent = surface.toFixed(4);
+            document.getElementById('cyl-lateral').textContent = lateral.toFixed(4);
+            document.getElementById('cyl-result').classList.add('show');
+        }
+
+        function calcCone() {
+            const r = parseFloat(document.getElementById('cone-radius').value);
+            const h = parseFloat(document.getElementById('cone-height').value);
+            
+            if (isNaN(r) || isNaN(h) || r <= 0 || h <= 0) {
+                alert('Будь ласка, введіть коректні значення!');
+                return;
+            }
+            
+            const volume = (1/3) * Math.PI * r * r * h;
+            const slant = Math.sqrt(r*r + h*h);
+            const surface = Math.PI * r * (r + slant);
+            
+            document.getElementById('cone-volume').textContent = volume.toFixed(4);
+            document.getElementById('cone-slant').textContent = slant.toFixed(4);
+            document.getElementById('cone-surface').textContent = surface.toFixed(4);
+            document.getElementById('cone-result').classList.add('show');
+        }
+
+        // Додаємо обробку Enter для всіх input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const form = this.closest('.calculator-form');
+                        const btn = form.querySelector('.calculate-btn');
+                        btn.click();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
